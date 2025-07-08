@@ -29,6 +29,7 @@ class CurrencyListViewController: UIViewController {
   private func configureUI() {
     view.backgroundColor = .white
     view.addSubview(tableView)
+    tableView.rowHeight = 60 // 2줄에 아이콘도 있기에 Cell 크기를 60 고정
     
     tableView.snp.makeConstraints {
       $0.directionalEdges.equalTo(view.safeAreaLayoutGuide)
