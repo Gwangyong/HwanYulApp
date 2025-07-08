@@ -14,7 +14,7 @@
 		794074C22E1BE90300BE6CC9 /* Exceptions for "HwanYulApp" folder in "HwanYulApp" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Info.plist,
+				Resources/Info.plist,
 			);
 			target = 794074AF2E1BE90200BE6CC9 /* HwanYulApp */;
 		};
