@@ -41,8 +41,9 @@ class CurrencyListViewController: UIViewController {
   private func fetchAndBindCurrencyData() {
     DataService().fetchCurrencyData { [weak self] currency in
       guard let self else { return }
-      
-      self.dataSource = currency.items
+    
+      // 소문자로 변경해서 반복 비교
+      self.dataSource = currency.items.sorted { $0.code.lowercased() < $1.code.lowercased() }
       DispatchQueue.main.async {
         self.tableView.reloadData() // UI랑 관련있는 UI 업데이트라 메인 스레드에서 수행
       }

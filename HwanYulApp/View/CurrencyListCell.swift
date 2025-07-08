@@ -14,14 +14,12 @@ final class CurrencyListCell: UITableViewCell {
   
   private let currencyCodeLabel: UILabel = { // 통화 코드
     let label = UILabel()
-    label.text = "KRW"
     label.textColor = .label
     return label
   }()
   
   private let exchangeRateLabel: UILabel = { // 환율
     let label = UILabel()
-    label.text = "10123"
     label.textColor = .label
     return label
   }()
