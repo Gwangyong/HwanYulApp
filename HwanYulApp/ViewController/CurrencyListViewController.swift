@@ -9,7 +9,7 @@ import UIKit
 
 class CurrencyListViewController: UIViewController {
   
-  private var dataSource: [(code: String, rate: Double)] = [] // 튜플을 여러개 담은 배열
+  private var dataSource: [CurrencyItem] = [] // 튜플을 여러개 담은 배열
   
   private lazy var tableView: UITableView = {
     let tableView = UITableView()
@@ -42,9 +42,7 @@ class CurrencyListViewController: UIViewController {
     DataService().fetchCurrencyData { [weak self] currency in
       guard let self else { return }
       
-      self.dataSource = currency.rates.map { (key, value) in // 순서 있는 튜플 배열로 변경
-        (code: key, rate: value)
-      }
+      self.dataSource = currency.items
       DispatchQueue.main.async {
         self.tableView.reloadData() // UI랑 관련있는 UI 업데이트라 메인 스레드에서 수행
       }
@@ -60,7 +58,7 @@ extension CurrencyListViewController: UITableViewDataSource {
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     guard let cell = tableView.dequeueReusableCell(withIdentifier: CurrencyListCell.identifier) as? CurrencyListCell else { return UITableViewCell() }
-    // TODO: Cell에 configure
+    cell.configureCell(currency: dataSource[indexPath.row])
     return cell
   }
 }

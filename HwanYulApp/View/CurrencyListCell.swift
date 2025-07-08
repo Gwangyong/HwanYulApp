@@ -51,4 +51,9 @@ final class CurrencyListCell: UITableViewCell {
       $0.trailing.equalToSuperview().inset(16)
     }
   }
+  
+  func configureCell(currency: CurrencyItem) {
+    currencyCodeLabel.text = "\(currency.code)"
+    exchangeRateLabel.text = "\(currency.rate)"
+  }
 }
