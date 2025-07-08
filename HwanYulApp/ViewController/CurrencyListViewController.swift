@@ -36,12 +36,16 @@ class CurrencyListViewController: UIViewController {
   }
   
   // MARK: - fetchAndBindCurrencyData
+  // 환율 데이터를 가져와서 바인딩하는 메서드
   private func fetchAndBindCurrencyData() {
     DataService().fetchCurrencyData { [weak self] currency in
       guard let self else { return }
       
       self.dataSource = currency.rates.map { (key, value) in // 순서 있는 튜플 배열로 변경
         (code: key, rate: value)
+      }
+      DispatchQueue.main.async {
+        self.tableView.reloadData() // UI랑 관련있는 UI 업데이트라 메인 스레드에서 수행
       }
     }
   }
