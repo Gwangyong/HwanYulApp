@@ -41,11 +41,17 @@ class CurrencyListViewController: UIViewController {
   private func fetchAndBindCurrencyData() {
     DataService().fetchCurrencyData { [weak self] currency in
       guard let self else { return }
-    
-      // 소문자로 변경해서 반복 비교
-      self.dataSource = currency.items.sorted { $0.code.lowercased() < $1.code.lowercased() }
-      DispatchQueue.main.async {
-        self.tableView.reloadData() // UI랑 관련있는 UI 업데이트라 메인 스레드에서 수행
+      
+      DispatchQueue.main.async { // UI 관련 작업들 메인 스레드에서 실행
+        // 데이터가 비어있을 경우 Alert 표시
+        if currency.items.isEmpty {
+          let alert = AlertFactory.noDataAlert()
+          self.present(alert, animated: true)
+        } else {
+          // 소문자로 변경해서 반복 비교
+          self.dataSource = currency.items.sorted { $0.code.lowercased() < $1.code.lowercased() }
+          self.tableView.reloadData() // UI랑 관련있는 UI 업데이트라 메인 스레드에서 수행
+        }
       }
     }
   }
