@@ -54,6 +54,6 @@ final class CurrencyListCell: UITableViewCell {
   
   func configureCell(currency: CurrencyItem) {
     currencyCodeLabel.text = "\(currency.code)"
-    exchangeRateLabel.text = "\(currency.rate)"
+    exchangeRateLabel.text = String(format: "%.4f", currency.rate)
   }
 }
