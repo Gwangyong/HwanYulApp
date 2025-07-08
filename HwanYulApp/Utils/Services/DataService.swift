@@ -18,11 +18,10 @@ final class DataService {
   }
   
   // MARK: - 서버에서 데이터를 불러오는 메서드
-  func fetchCurrencyData() {
+  func fetchCurrencyData(completion: @escaping (Currency) -> Void) {
     // URL 생성
     let baseCode = "USD" // "KRW", "EUR"
-    let urlComponents = URLComponents(string: "https://open.er-api.com/v6/latest/\(baseCode)")
-    guard let url = urlComponents?.url else {
+    guard let url = URL(string: "https://open.er-api.com/v6/latest/\(baseCode)") else {
       print("잘못된 URL입니다.")
       return
     }
@@ -31,9 +30,7 @@ final class DataService {
       
       switch result {
       case .success(let result):
-        print("성공")
-        print(result.baseCode)
-        print(result.rates)
+        completion(result)
       case .failure(let error):
         print("파싱 실패: \(error)")
       }
