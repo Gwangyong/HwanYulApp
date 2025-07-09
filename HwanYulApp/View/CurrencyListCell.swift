@@ -57,10 +57,10 @@ final class CurrencyListCell: UITableViewCell {
       labelStackView.addArrangedSubview($0)
     }
     
-    contentView.snp.makeConstraints {
-      $0.directionalEdges.equalToSuperview()
-      // 높이 60은 tableView.rowHeight = 60을 주었음
-    }
+//    contentView.snp.makeConstraints {
+//      $0.directionalEdges.equalToSuperview()
+//      // 높이 60은 tableView.rowHeight = 60을 주었음
+//    }
     
     labelStackView.snp.makeConstraints {
       $0.leading.equalToSuperview().inset(16)
