@@ -40,7 +40,7 @@ class CurrencyListViewController: UIViewController {
     [searchBar, tableView].forEach {
       view.addSubview($0)
     }
-    tableView.rowHeight = 60 // 2줄에 아이콘도 있기에 Cell 크기를 60 고정
+    tableView.rowHeight = CurrencyListCell.height // 60
     
     searchBar.snp.makeConstraints {
       $0.top.equalTo(view.safeAreaLayoutGuide)
@@ -95,16 +95,16 @@ extension CurrencyListViewController: UISearchBarDelegate {
   // UISearchBarDelegate 프로토콜에 정의된 메서드.
   // 검색바 텍스트가 바뀔 때마다 자동 호출되는 콜백 함수
   func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-    let textLine = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() // 공백,\n등 제거, 소문자.
+    let searchKeyword = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() // 공백,\n등 제거, 소문자.
     
-    if textLine.isEmpty { // 공백이라면 초기 상태로
+    if searchKeyword.isEmpty { // 공백이라면 초기 상태로
       dataSource = allCurrencyItems
     } else {
       dataSource = allCurrencyItems.filter {
         // code나 countryName 중 하나라도 textLine이 포함되어 있는게 있다면 그 항목만 필터링해서 dataSource에 넣음
         // contains. 포함이므로, 맨 앞이 아니라 어느 위치든 포함되면 true
-        $0.code.lowercased().contains(textLine) ||
-        $0.countryName.lowercased().contains(textLine)
+        $0.code.lowercased().contains(searchKeyword) ||
+        $0.countryName.lowercased().contains(searchKeyword)
       }
     }
     self.tableView.reloadData()
