@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		7940750A2E1CE05400BE6CC9 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 794075092E1CE05400BE6CC9 /* Alamofire */; };
+		7940750D2E1CE06500BE6CC9 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7940750C2E1CE06500BE6CC9 /* SnapKit */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		794074B02E1BE90200BE6CC9 /* HwanYulApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HwanYulApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -14,7 +19,7 @@
 		794074C22E1BE90300BE6CC9 /* Exceptions for "HwanYulApp" folder in "HwanYulApp" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Info.plist,
+				Resources/Info.plist,
 			);
 			target = 794074AF2E1BE90200BE6CC9 /* HwanYulApp */;
 		};
@@ -36,6 +41,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7940750A2E1CE05400BE6CC9 /* Alamofire in Frameworks */,
+				7940750D2E1CE06500BE6CC9 /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +85,8 @@
 			);
 			name = HwanYulApp;
 			packageProductDependencies = (
+				794075092E1CE05400BE6CC9 /* Alamofire */,
+				7940750C2E1CE06500BE6CC9 /* SnapKit */,
 			);
 			productName = HwanYulApp;
 			productReference = 794074B02E1BE90200BE6CC9 /* HwanYulApp.app */;
@@ -107,6 +116,10 @@
 			);
 			mainGroup = 794074A72E1BE90200BE6CC9;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				794075082E1CE05400BE6CC9 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				7940750B2E1CE06500BE6CC9 /* XCRemoteSwiftPackageReference "SnapKit" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 794074B12E1BE90200BE6CC9 /* Products */;
 			projectDirPath = "";
@@ -146,7 +159,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = HwanYulApp/Info.plist;
+				INFOPLIST_FILE = HwanYulApp/Resources/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -176,7 +189,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = HwanYulApp/Info.plist;
+				INFOPLIST_FILE = HwanYulApp/Resources/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -339,6 +352,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		794075082E1CE05400BE6CC9 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.10.2;
+			};
+		};
+		7940750B2E1CE06500BE6CC9 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.7.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		794075092E1CE05400BE6CC9 /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 794075082E1CE05400BE6CC9 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+		7940750C2E1CE06500BE6CC9 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7940750B2E1CE06500BE6CC9 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 794074A82E1BE90200BE6CC9 /* Project object */;
 }
