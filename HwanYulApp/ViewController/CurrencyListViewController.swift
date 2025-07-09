@@ -11,6 +11,14 @@ class CurrencyListViewController: UIViewController {
   
   private var dataSource: [CurrencyItem] = [] // 튜플을 여러개 담은 배열
   
+  private let searchBar: UISearchBar = {
+    let searchBar = UISearchBar()
+    searchBar.placeholder = "통화 검색"
+    searchBar.searchBarStyle = .minimal
+    
+    return searchBar
+  }()
+  
   private lazy var tableView: UITableView = {
     let tableView = UITableView()
     tableView.dataSource = self
@@ -28,11 +36,19 @@ class CurrencyListViewController: UIViewController {
   // MARK: - configureUI
   private func configureUI() {
     view.backgroundColor = .white
-    view.addSubview(tableView)
+    [searchBar, tableView].forEach {
+      view.addSubview($0)
+    }
     tableView.rowHeight = 60 // 2줄에 아이콘도 있기에 Cell 크기를 60 고정
     
+    searchBar.snp.makeConstraints {
+      $0.top.equalTo(view.safeAreaLayoutGuide)
+      $0.leading.trailing.equalToSuperview()
+    }
+    
     tableView.snp.makeConstraints {
-      $0.directionalEdges.equalTo(view.safeAreaLayoutGuide)
+      $0.top.equalTo(searchBar.snp.bottom)
+      $0.leading.trailing.bottom.equalTo(view.safeAreaLayoutGuide)
     }
   }
   
