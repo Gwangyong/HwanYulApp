@@ -9,12 +9,14 @@ import UIKit
 
 class CurrencyListViewController: UIViewController {
   
-  private var dataSource: [CurrencyItem] = [] // 튜플을 여러개 담은 배열
+  private var dataSource: [CurrencyItem] = []
+  private var allCurrencyItems: [CurrencyItem] = []
   
-  private let searchBar: UISearchBar = {
+  private lazy var searchBar: UISearchBar = {
     let searchBar = UISearchBar()
     searchBar.placeholder = "통화 검색"
     searchBar.searchBarStyle = .minimal
+    searchBar.delegate = self
     return searchBar
   }()
   
@@ -26,6 +28,15 @@ class CurrencyListViewController: UIViewController {
     return tableView
   }()
   
+  private let resultLabel: UILabel = {
+    let label = UILabel()
+    label.text = "검색 결과 없음"
+    label.font = .systemFont(ofSize: 24, weight: .bold)
+    label.textColor = .label
+    label.isHidden = true
+    return label
+  }()
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     configureUI()
@@ -34,11 +45,12 @@ class CurrencyListViewController: UIViewController {
   
   // MARK: - configureUI
   private func configureUI() {
-    view.backgroundColor = .white
-    [searchBar, tableView].forEach {
+    view.backgroundColor = .systemBackground
+    [searchBar, tableView, resultLabel].forEach {
       view.addSubview($0)
     }
-    tableView.rowHeight = 60 // 2줄에 아이콘도 있기에 Cell 크기를 60 고정
+    
+    tableView.rowHeight = CurrencyListCell.height // 60
     
     searchBar.snp.makeConstraints {
       $0.top.equalTo(view.safeAreaLayoutGuide)
@@ -48,6 +60,10 @@ class CurrencyListViewController: UIViewController {
     tableView.snp.makeConstraints {
       $0.top.equalTo(searchBar.snp.bottom)
       $0.leading.trailing.bottom.equalTo(view.safeAreaLayoutGuide)
+    }
+    
+    resultLabel.snp.makeConstraints {
+      $0.center.equalToSuperview()
     }
   }
   
@@ -65,6 +81,7 @@ class CurrencyListViewController: UIViewController {
         } else {
           // 소문자로 변경해서 반복 비교
           self.dataSource = currency.items.sorted { $0.code.lowercased() < $1.code.lowercased() }
+          self.allCurrencyItems = currency.items.sorted { $0.code.lowercased() < $1.code.lowercased() }
           self.tableView.reloadData() // UI랑 관련있는 UI 업데이트라 메인 스레드에서 수행
         }
       }
@@ -87,3 +104,28 @@ extension CurrencyListViewController: UITableViewDataSource {
 
 // MARK: - Delegate
 extension CurrencyListViewController: UITableViewDelegate { }
+
+extension CurrencyListViewController: UISearchBarDelegate {
+  // UISearchBarDelegate 프로토콜에 정의된 메서드.
+  // 검색바 텍스트가 바뀔 때마다 자동 호출되는 콜백 함수
+  func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+    let searchKeyword = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() // 공백,\n등 제거, 소문자.
+    
+    if searchKeyword.isEmpty { // 공백이라면 초기 상태로
+      dataSource = allCurrencyItems
+    } else {
+      dataSource = allCurrencyItems.filter {
+        // code나 countryName 중 하나라도 textLine이 포함되어 있는게 있다면 그 항목만 필터링해서 dataSource에 넣음
+        // contains. 포함이므로, 맨 앞이 아니라 어느 위치든 포함되면 true
+        $0.code.lowercased().contains(searchKeyword) ||
+        $0.countryName.lowercased().contains(searchKeyword)
+      }
+    }
+    
+    // dataSource가 비어있으면 tableView를 숨기고, resultLabel을 보여줌.
+    let isEmpty = dataSource.isEmpty
+    tableView.isHidden = isEmpty
+    resultLabel.isHidden = !isEmpty
+    tableView.reloadData()
+  }
+}
