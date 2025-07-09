@@ -9,15 +9,8 @@ import UIKit
 
 class CurrencyListViewController: UIViewController {
   
+  private let currencyListView = CurrencyListView()
   private var dataSource: [CurrencyItem] = [] // 튜플을 여러개 담은 배열
-  
-  private lazy var tableView: UITableView = {
-    let tableView = UITableView()
-    tableView.dataSource = self
-    tableView.delegate = self
-    tableView.register(CurrencyListCell.self, forCellReuseIdentifier: CurrencyListCell.identifier)
-    return tableView
-  }()
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -28,12 +21,14 @@ class CurrencyListViewController: UIViewController {
   // MARK: - configureUI
   private func configureUI() {
     view.backgroundColor = .white
-    view.addSubview(tableView)
-    tableView.rowHeight = 60 // 2줄에 아이콘도 있기에 Cell 크기를 60 고정
+    view.addSubview(currencyListView)
     
-    tableView.snp.makeConstraints {
+    currencyListView.snp.makeConstraints {
       $0.directionalEdges.equalTo(view.safeAreaLayoutGuide)
     }
+    
+    currencyListView.tableView.dataSource = self
+    currencyListView.tableView.delegate = self
   }
   
   // MARK: - fetchAndBindCurrencyData
@@ -50,7 +45,7 @@ class CurrencyListViewController: UIViewController {
         } else {
           // 소문자로 변경해서 반복 비교
           self.dataSource = currency.items.sorted { $0.code.lowercased() < $1.code.lowercased() }
-          self.tableView.reloadData() // UI랑 관련있는 UI 업데이트라 메인 스레드에서 수행
+          self.currencyListView.tableView.reloadData() // UI랑 관련있는 UI 업데이트라 메인 스레드에서 수행
         }
       }
     }
