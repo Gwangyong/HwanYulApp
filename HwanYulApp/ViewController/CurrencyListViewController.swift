@@ -45,7 +45,7 @@ class CurrencyListViewController: UIViewController {
   
   // MARK: - configureUI
   private func configureUI() {
-    view.backgroundColor = .white
+    view.backgroundColor = .systemBackground
     [searchBar, tableView, resultLabel].forEach {
       view.addSubview($0)
     }
