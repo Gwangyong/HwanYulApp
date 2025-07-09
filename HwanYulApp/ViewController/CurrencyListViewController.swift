@@ -9,8 +9,8 @@ import UIKit
 
 class CurrencyListViewController: UIViewController {
   
-  private var dataSource: [CurrencyItem] = []
-  private var allCurrencyItems: [CurrencyItem] = []
+  private var dataSource: [CurrencyItem] = [] // 화면 표시 데이터
+  private var allCurrencyItems: [CurrencyItem] = [] // 원본 데이터 저장
   
   private lazy var searchBar: UISearchBar = {
     let searchBar = UISearchBar()
@@ -103,7 +103,12 @@ extension CurrencyListViewController: UITableViewDataSource {
 }
 
 // MARK: - Delegate
-extension CurrencyListViewController: UITableViewDelegate { }
+extension CurrencyListViewController: UITableViewDelegate {
+  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    let vc = CurrencyCalculatorViewController()
+    navigationController?.pushViewController(vc, animated: true)
+  }
+}
 
 extension CurrencyListViewController: UISearchBarDelegate {
   // UISearchBarDelegate 프로토콜에 정의된 메서드.
