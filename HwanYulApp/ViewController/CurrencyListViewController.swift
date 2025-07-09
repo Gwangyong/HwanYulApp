@@ -15,7 +15,6 @@ class CurrencyListViewController: UIViewController {
     let searchBar = UISearchBar()
     searchBar.placeholder = "통화 검색"
     searchBar.searchBarStyle = .minimal
-    
     return searchBar
   }()
   
@@ -87,6 +86,4 @@ extension CurrencyListViewController: UITableViewDataSource {
 }
 
 // MARK: - Delegate
-extension CurrencyListViewController: UITableViewDelegate {
-  
-}
+extension CurrencyListViewController: UITableViewDelegate { }
