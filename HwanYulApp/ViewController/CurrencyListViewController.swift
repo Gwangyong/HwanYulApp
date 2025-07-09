@@ -28,6 +28,15 @@ class CurrencyListViewController: UIViewController {
     return tableView
   }()
   
+  private let resultLabel: UILabel = {
+    let label = UILabel()
+    label.text = "검색 결과 없음"
+    label.font = .systemFont(ofSize: 24, weight: .bold)
+    label.textColor = .label
+    label.isHidden = true
+    return label
+  }()
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     configureUI()
@@ -37,9 +46,10 @@ class CurrencyListViewController: UIViewController {
   // MARK: - configureUI
   private func configureUI() {
     view.backgroundColor = .white
-    [searchBar, tableView].forEach {
+    [searchBar, tableView, resultLabel].forEach {
       view.addSubview($0)
     }
+    
     tableView.rowHeight = CurrencyListCell.height // 60
     
     searchBar.snp.makeConstraints {
@@ -50,6 +60,10 @@ class CurrencyListViewController: UIViewController {
     tableView.snp.makeConstraints {
       $0.top.equalTo(searchBar.snp.bottom)
       $0.leading.trailing.bottom.equalTo(view.safeAreaLayoutGuide)
+    }
+    
+    resultLabel.snp.makeConstraints {
+      $0.center.equalToSuperview()
     }
   }
   
@@ -107,6 +121,11 @@ extension CurrencyListViewController: UISearchBarDelegate {
         $0.countryName.lowercased().contains(searchKeyword)
       }
     }
-    self.tableView.reloadData()
+    
+    // dataSource가 비어있으면 tableView를 숨기고, resultLabel을 보여줌.
+    let isEmpty = dataSource.isEmpty
+    tableView.isHidden = isEmpty
+    resultLabel.isHidden = !isEmpty
+    tableView.reloadData()
   }
 }
