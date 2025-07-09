@@ -22,6 +22,7 @@ class CurrencyListViewController: UIViewController {
   
   private lazy var tableView: UITableView = {
     let tableView = UITableView()
+    tableView.rowHeight = CurrencyListCell.height // 60
     tableView.dataSource = self
     tableView.delegate = self
     tableView.register(CurrencyListCell.self, forCellReuseIdentifier: CurrencyListCell.identifier)
@@ -39,19 +40,22 @@ class CurrencyListViewController: UIViewController {
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    configureUI()
+    configureViews()
+    configureLayout()
     fetchAndBindCurrencyData()
   }
   
-  // MARK: - configureUI
-  private func configureUI() {
+  // MARK: - configureViews
+  private func configureViews() {
     view.backgroundColor = .systemBackground
+    
     [searchBar, tableView, resultLabel].forEach {
       view.addSubview($0)
     }
-    
-    tableView.rowHeight = CurrencyListCell.height // 60
-    
+  }
+  
+  // MARK: - configureLayout
+  private func configureLayout() {
     searchBar.snp.makeConstraints {
       $0.top.equalTo(view.safeAreaLayoutGuide)
       $0.leading.trailing.equalToSuperview()
@@ -80,8 +84,9 @@ class CurrencyListViewController: UIViewController {
           self.present(alert, animated: true)
         } else {
           // 소문자로 변경해서 반복 비교
-          self.dataSource = currency.items.sorted { $0.code.lowercased() < $1.code.lowercased() }
-          self.allCurrencyItems = currency.items.sorted { $0.code.lowercased() < $1.code.lowercased() }
+          let sortedItems = currency.items.sorted { $0.code.lowercased() < $1.code.lowercased() }
+          self.dataSource = sortedItems
+          self.allCurrencyItems = sortedItems
           self.tableView.reloadData() // UI랑 관련있는 UI 업데이트라 메인 스레드에서 수행
         }
       }

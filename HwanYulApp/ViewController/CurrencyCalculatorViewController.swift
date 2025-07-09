@@ -9,62 +9,24 @@ import UIKit
 import SnapKit
 
 class CurrencyCalculatorViewController: UIViewController {
+  private let labelStackView = UIStackView()
+  private let currencyCodeLabel = UILabel()
+  private let countryNameLabel = UILabel()
   
-  private let labelStackView: UIStackView = { // 통화코드 + 국가명 스택뷰
-    let stackView = UIStackView()
-    stackView.axis = .vertical
-    stackView.spacing = 4
-    stackView.alignment = .center
-    return stackView
-  }()
-  
-  private let currencyCodeLabel: UILabel = { // 통화 코드
-    let label = UILabel()
-    label.font = .systemFont(ofSize: 24, weight: .bold)
-    return label
-  }()
-  
-  private let countryNameLabel: UILabel = { // 국가명
-    let label = UILabel()
-    label.font = .systemFont(ofSize: 16)
-    label.textColor = .gray
-    return label
-  }()
-  
-  private let amountTextField: UITextField = {
-    let textField = UITextField()
-    textField.borderStyle = .roundedRect // 외각선을 둥근 사각형 스타일로 설정
-    textField.keyboardType = .decimalPad // 소수점 입력용 키보드 표시
-    textField.textAlignment = .center
-    textField.placeholder = "금액을 입력하세요"
-    return textField
-  }()
-  
-  private let convertButton: UIButton = {
-    let button = UIButton()
-    button.backgroundColor = .systemBlue
-    button.setTitleColor(.white, for: .normal)
-    button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
-    button.layer.cornerRadius = 8
-    button.clipsToBounds = true
-    return button
-  }()
-  
-  private let resultLabel: UILabel = {
-    let label = UILabel()
-    label.font = .systemFont(ofSize: 20, weight: .medium)
-    label.textAlignment = .center
-    label.numberOfLines = 0
-    return label
-  }()
+  private let amountTextField = UITextField()
+  private let convertButton = UIButton()
+  private let resultLabel = UILabel()
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    configureUI()
+    configureViews()
+    configureLayout()
   }
   
-  private func configureUI() {
+  // MARK: - configureViews
+  private func configureViews() {
     view.backgroundColor = .systemBackground
+    
     [labelStackView, amountTextField, convertButton, resultLabel].forEach {
       view.addSubview($0)
     }
@@ -73,6 +35,54 @@ class CurrencyCalculatorViewController: UIViewController {
       labelStackView.addArrangedSubview($0)
     }
     
+    configureLabelStackView()
+    configureCurrencyCodeLabel()
+    configureCountryNameLabel()
+    configureAmountTextField()
+    configureConvertButton()
+    configureResultLabel()
+  }
+  
+  private func configureLabelStackView() {
+    labelStackView.axis = .vertical
+    labelStackView.spacing = 4
+    labelStackView.alignment = .center
+  }
+  
+  private func configureCurrencyCodeLabel() {
+    currencyCodeLabel.font = .systemFont(ofSize: 24, weight: .bold)
+  }
+  
+  private func configureCountryNameLabel() {
+    countryNameLabel.font = .systemFont(ofSize: 16)
+    countryNameLabel.textColor = .gray
+  }
+  
+  private func configureAmountTextField() {
+    amountTextField.borderStyle = .roundedRect // 외각선을 둥근 사각형 스타일로 설정
+    amountTextField.keyboardType = .decimalPad // 소수점 입력용 키보드 표시
+    amountTextField.textAlignment = .center
+    amountTextField.placeholder = "금액을 입력하세요"
+  }
+  
+  private func configureConvertButton() {
+    convertButton.backgroundColor = .systemBlue
+    convertButton.setTitle("환율 계산", for: .normal)
+    convertButton.setTitleColor(.white, for: .normal)
+    convertButton.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
+    convertButton.layer.cornerRadius = 8
+    convertButton.clipsToBounds = true
+  }
+  
+  private func configureResultLabel() {
+    resultLabel.text = "계산 결과가 여기에 표시됩니다"
+    resultLabel.font = .systemFont(ofSize: 20, weight: .medium)
+    resultLabel.textAlignment = .center
+    resultLabel.numberOfLines = 0
+  }
+  
+  // MARK: - configureLayout
+  private func configureLayout() {
     labelStackView.snp.makeConstraints {
       $0.top.equalTo(view.safeAreaLayoutGuide).offset(32)
       $0.centerX.equalToSuperview()
