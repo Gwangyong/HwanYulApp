@@ -20,6 +20,10 @@ struct Currency: Codable {
 struct CurrencyItem {
   let code: String
   let rate: Double
+  
+  var countryName: String {
+    CurrencyCountryMap.mapping[code] ?? "데이터에 없는 나라입니다."
+  }
 }
 
 // MARK: Currency -> [CurrencyItem]으로 변환

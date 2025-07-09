@@ -18,6 +18,12 @@ final class CurrencyListCell: UITableViewCell {
     return label
   }()
   
+  private let countryNameLabel: UILabel = { // 국가명
+    let label = UILabel()
+    label.textColor = .label
+    return label
+  }()
+  
   private let exchangeRateLabel: UILabel = { // 환율
     let label = UILabel()
     label.textColor = .label
@@ -35,12 +41,15 @@ final class CurrencyListCell: UITableViewCell {
   
   // MARK: - configureUI
   private func configureUI() {
-    [currencyCodeLabel, exchangeRateLabel].forEach {
+    [currencyCodeLabel, countryNameLabel, exchangeRateLabel].forEach {
       contentView.addSubview($0)
     }
     
     currencyCodeLabel.snp.makeConstraints {
-      $0.centerY.equalToSuperview()
+      $0.leading.equalToSuperview().inset(16)
+    }
+    
+    countryNameLabel.snp.makeConstraints {
       $0.leading.equalToSuperview().inset(16)
     }
     
@@ -53,5 +62,6 @@ final class CurrencyListCell: UITableViewCell {
   func configureCell(currency: CurrencyItem) {
     currencyCodeLabel.text = "\(currency.code)"
     exchangeRateLabel.text = String(format: "%.4f", currency.rate)
+    countryNameLabel.text = "\(currency.countryName)"
   }
 }
