@@ -73,7 +73,10 @@ class CurrencyCalculatorViewController: UIViewController {
     amountTextField.borderStyle = .roundedRect // 외각선을 둥근 사각형 스타일로 설정
     amountTextField.keyboardType = .decimalPad // 소수점 입력용 키보드 표시
     amountTextField.textAlignment = .center
-    amountTextField.placeholder = "달러(USD)를 입력하세요"
+    amountTextField.attributedPlaceholder = NSAttributedString( // 다크모드 대응을 위해 색상 적용
+      string: "달러(USD)를 입력하세요",
+      attributes: [.foregroundColor: UIColor.secondaryLabel] // 글자 색상 속성
+      )
   }
   
   private func configureConvertButton() {
