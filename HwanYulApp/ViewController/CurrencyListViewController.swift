@@ -9,8 +9,16 @@ import UIKit
 
 class CurrencyListViewController: UIViewController {
   
-  private var dataSource: [CurrencyItem] = []
-  private var allCurrencyItems: [CurrencyItem] = []
+  private var dataSource: [CurrencyItem] = [] // 화면 표시 데이터
+  private var allCurrencyItems: [CurrencyItem] = [] // 원본 데이터 저장
+  
+  private let titleLabel: UILabel = {
+    let label = UILabel()
+    label.text = "환율 정보"
+    label.font = .systemFont(ofSize: 28, weight: .bold)
+    label.textAlignment = .left
+    return label
+  }()
   
   private lazy var searchBar: UISearchBar = {
     let searchBar = UISearchBar()
@@ -22,6 +30,7 @@ class CurrencyListViewController: UIViewController {
   
   private lazy var tableView: UITableView = {
     let tableView = UITableView()
+    tableView.rowHeight = CurrencyListCell.height // 60
     tableView.dataSource = self
     tableView.delegate = self
     tableView.register(CurrencyListCell.self, forCellReuseIdentifier: CurrencyListCell.identifier)
@@ -39,21 +48,29 @@ class CurrencyListViewController: UIViewController {
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    configureUI()
+    configureViews()
+    configureLayout()
     fetchAndBindCurrencyData()
   }
   
-  // MARK: - configureUI
-  private func configureUI() {
+  // MARK: - configureViews
+  private func configureViews() {
     view.backgroundColor = .systemBackground
-    [searchBar, tableView, resultLabel].forEach {
+    
+    [titleLabel, searchBar, tableView, resultLabel].forEach {
       view.addSubview($0)
     }
-    
-    tableView.rowHeight = CurrencyListCell.height // 60
+  }
+  
+  // MARK: - configureLayout
+  private func configureLayout() {
+    titleLabel.snp.makeConstraints {
+      $0.top.equalTo(view.safeAreaLayoutGuide).offset(16)
+      $0.leading.equalTo(view.safeAreaLayoutGuide).offset(20)
+    }
     
     searchBar.snp.makeConstraints {
-      $0.top.equalTo(view.safeAreaLayoutGuide)
+      $0.top.equalTo(titleLabel.snp.bottom)
       $0.leading.trailing.equalToSuperview()
     }
     
@@ -76,12 +93,13 @@ class CurrencyListViewController: UIViewController {
       DispatchQueue.main.async { // UI 관련 작업들 메인 스레드에서 실행
         // 데이터가 비어있을 경우 Alert 표시
         if currency.items.isEmpty {
-          let alert = AlertFactory.noDataAlert()
+          let alert = AlertFactory.makeAlert(.noData)
           self.present(alert, animated: true)
         } else {
           // 소문자로 변경해서 반복 비교
-          self.dataSource = currency.items.sorted { $0.code.lowercased() < $1.code.lowercased() }
-          self.allCurrencyItems = currency.items.sorted { $0.code.lowercased() < $1.code.lowercased() }
+          let sortedItems = currency.items.sorted { $0.code.lowercased() < $1.code.lowercased() }
+          self.dataSource = sortedItems
+          self.allCurrencyItems = sortedItems
           self.tableView.reloadData() // UI랑 관련있는 UI 업데이트라 메인 스레드에서 수행
         }
       }
@@ -103,7 +121,14 @@ extension CurrencyListViewController: UITableViewDataSource {
 }
 
 // MARK: - Delegate
-extension CurrencyListViewController: UITableViewDelegate { }
+extension CurrencyListViewController: UITableViewDelegate {
+  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    let vc = CurrencyCalculatorViewController()
+    vc.currencyItem = dataSource[indexPath.row] // vc에 눌린 셀의 정보를 넘겨줌
+    navigationItem.backButtonTitle = "환율 정보"
+    navigationController?.pushViewController(vc, animated: true)
+  }
+}
 
 extension CurrencyListViewController: UISearchBarDelegate {
   // UISearchBarDelegate 프로토콜에 정의된 메서드.
