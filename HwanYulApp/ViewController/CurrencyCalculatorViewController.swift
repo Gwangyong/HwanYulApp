@@ -90,13 +90,13 @@ class CurrencyCalculatorViewController: UIViewController {
     
     amountTextField.snp.makeConstraints {
       $0.top.equalTo(labelStackView.snp.bottom).offset(32)
-      $0.leading.trailing.equalToSuperview().inset(24)
+      $0.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(24)
       $0.height.equalTo(44)
     }
     
     convertButton.snp.makeConstraints {
       $0.top.equalTo(amountTextField.snp.bottom).offset(24)
-      $0.leading.trailing.equalToSuperview().inset(24)
+      $0.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(24)
       $0.height.equalTo(44)
     }
     
