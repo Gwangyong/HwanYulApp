@@ -93,7 +93,7 @@ class CurrencyListViewController: UIViewController {
       DispatchQueue.main.async { // UI 관련 작업들 메인 스레드에서 실행
         // 데이터가 비어있을 경우 Alert 표시
         if currency.items.isEmpty {
-          let alert = AlertFactory.noDataAlert()
+          let alert = AlertFactory.makeAlert(.noData)
           self.present(alert, animated: true)
         } else {
           // 소문자로 변경해서 반복 비교
