@@ -12,6 +12,14 @@ class CurrencyListViewController: UIViewController {
   private var dataSource: [CurrencyItem] = [] // 화면 표시 데이터
   private var allCurrencyItems: [CurrencyItem] = [] // 원본 데이터 저장
   
+  private let titleLabel: UILabel = {
+    let label = UILabel()
+    label.text = "환율 정보"
+    label.font = .systemFont(ofSize: 28, weight: .bold)
+    label.textAlignment = .left
+    return label
+  }()
+  
   private lazy var searchBar: UISearchBar = {
     let searchBar = UISearchBar()
     searchBar.placeholder = "통화 검색"
@@ -49,15 +57,20 @@ class CurrencyListViewController: UIViewController {
   private func configureViews() {
     view.backgroundColor = .systemBackground
     
-    [searchBar, tableView, resultLabel].forEach {
+    [titleLabel, searchBar, tableView, resultLabel].forEach {
       view.addSubview($0)
     }
   }
   
   // MARK: - configureLayout
   private func configureLayout() {
+    titleLabel.snp.makeConstraints {
+      $0.top.equalTo(view.safeAreaLayoutGuide).offset(16)
+      $0.leading.equalTo(view.safeAreaLayoutGuide).offset(20)
+    }
+    
     searchBar.snp.makeConstraints {
-      $0.top.equalTo(view.safeAreaLayoutGuide)
+      $0.top.equalTo(titleLabel.snp.bottom)
       $0.leading.trailing.equalToSuperview()
     }
     
@@ -111,6 +124,8 @@ extension CurrencyListViewController: UITableViewDataSource {
 extension CurrencyListViewController: UITableViewDelegate {
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     let vc = CurrencyCalculatorViewController()
+    vc.currencyItem = dataSource[indexPath.row] // vc에 눌린 셀의 정보를 넘겨줌
+    navigationItem.backButtonTitle = "환율 정보"
     navigationController?.pushViewController(vc, animated: true)
   }
 }

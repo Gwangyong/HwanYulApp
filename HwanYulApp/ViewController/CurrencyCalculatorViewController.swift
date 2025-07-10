@@ -9,6 +9,8 @@ import UIKit
 import SnapKit
 
 class CurrencyCalculatorViewController: UIViewController {
+  private let titleLabel = UILabel()
+  
   private let labelStackView = UIStackView()
   private let currencyCodeLabel = UILabel()
   private let countryNameLabel = UILabel()
@@ -16,6 +18,8 @@ class CurrencyCalculatorViewController: UIViewController {
   private let amountTextField = UITextField()
   private let convertButton = UIButton()
   private let resultLabel = UILabel()
+  
+  var currencyItem: CurrencyItem?
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -27,7 +31,7 @@ class CurrencyCalculatorViewController: UIViewController {
   private func configureViews() {
     view.backgroundColor = .systemBackground
     
-    [labelStackView, amountTextField, convertButton, resultLabel].forEach {
+    [titleLabel, labelStackView, amountTextField, convertButton, resultLabel].forEach {
       view.addSubview($0)
     }
     
@@ -35,12 +39,19 @@ class CurrencyCalculatorViewController: UIViewController {
       labelStackView.addArrangedSubview($0)
     }
     
+    configureTitleLabel()
     configureLabelStackView()
     configureCurrencyCodeLabel()
     configureCountryNameLabel()
     configureAmountTextField()
     configureConvertButton()
     configureResultLabel()
+  }
+  
+  private func configureTitleLabel() {
+    titleLabel.text = "환율 계산기"
+    titleLabel.font = .systemFont(ofSize: 28, weight: .bold)
+    titleLabel.textAlignment = .left
   }
   
   private func configureLabelStackView() {
@@ -50,10 +61,12 @@ class CurrencyCalculatorViewController: UIViewController {
   }
   
   private func configureCurrencyCodeLabel() {
+    currencyCodeLabel.text = currencyItem?.code
     currencyCodeLabel.font = .systemFont(ofSize: 24, weight: .bold)
   }
   
   private func configureCountryNameLabel() {
+    countryNameLabel.text = currencyItem?.countryName
     countryNameLabel.font = .systemFont(ofSize: 16)
     countryNameLabel.textColor = .gray
   }
@@ -83,8 +96,13 @@ class CurrencyCalculatorViewController: UIViewController {
   
   // MARK: - configureLayout
   private func configureLayout() {
+    titleLabel.snp.makeConstraints {
+      $0.top.equalTo(view.safeAreaLayoutGuide).offset(16)
+      $0.leading.equalTo(view.safeAreaLayoutGuide).offset(20)
+    }
+    
     labelStackView.snp.makeConstraints {
-      $0.top.equalTo(view.safeAreaLayoutGuide).offset(32)
+      $0.top.equalTo(titleLabel.snp.bottom).offset(32)
       $0.centerX.equalToSuperview()
     }
     
