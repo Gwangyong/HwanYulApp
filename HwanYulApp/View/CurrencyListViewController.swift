@@ -9,9 +9,6 @@ import UIKit
 
 class CurrencyListViewController: UIViewController {
   
-  private var dataSource: [CurrencyItem] = [] // 화면 표시 데이터
-  private var allCurrencyItems: [CurrencyItem] = [] // 원본 데이터 저장
-  
   private let titleLabel: UILabel = {
     let label = UILabel()
     label.text = "환율 정보"
@@ -33,7 +30,7 @@ class CurrencyListViewController: UIViewController {
     tableView.rowHeight = CurrencyListCell.height // 60
     tableView.dataSource = self
     tableView.delegate = self
-    tableView.register(CurrencyListCell.self, forCellReuseIdentifier: CurrencyListCell.identifier)
+    tableView.register(CurrencyListCell.self, forCellReuseIdentifier: CurrencyListCell.identifier) // Cell UI 생성이라 View에서
     return tableView
   }()
   
@@ -46,11 +43,36 @@ class CurrencyListViewController: UIViewController {
     return label
   }()
   
+  private let viewModel = CurrencyListViewModel()
+  private var items: [CurrencyItem] = [] // 이렇게 변수를 직접 VC가 가지고 있어도 괜찮은건가..
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     configureViews()
     configureLayout()
-    fetchAndBindCurrencyData()
+    bindViewModel() // 콜백 먼저 연결
+    viewModel.action(.loadData) // API 가져와서 .success 상태 전달
+  }
+  
+  // MARK: - ViewModel Binding
+  private func bindViewModel() {
+    viewModel.stateDidChange = { [weak self] state in
+      guard let self else { return }
+      
+      DispatchQueue.main.async {
+        switch state {
+        case .success(let items):
+          self.items = items
+          let isEmpty = items.isEmpty
+          self.tableView.isHidden = isEmpty
+          self.resultLabel.isHidden = !isEmpty
+          self.tableView.reloadData()
+        case .failure:
+          let alert = AlertFactory.makeAlert(.noData)
+          self.present(alert, animated: true)
+        }
+      }
+    }
   }
   
   // MARK: - configureViews
@@ -83,39 +105,17 @@ class CurrencyListViewController: UIViewController {
       $0.center.equalToSuperview()
     }
   }
-  
-  // MARK: - fetchAndBindCurrencyData
-  // 환율 데이터를 가져와서 바인딩하는 메서드
-  private func fetchAndBindCurrencyData() {
-    DataService().fetchCurrencyData { [weak self] currency in
-      guard let self else { return }
-      
-      DispatchQueue.main.async { // UI 관련 작업들 메인 스레드에서 실행
-        // 데이터가 비어있을 경우 Alert 표시
-        if currency.items.isEmpty {
-          let alert = AlertFactory.makeAlert(.noData)
-          self.present(alert, animated: true)
-        } else {
-          // 소문자로 변경해서 반복 비교
-          let sortedItems = currency.items.sorted { $0.code.lowercased() < $1.code.lowercased() }
-          self.dataSource = sortedItems
-          self.allCurrencyItems = sortedItems
-          self.tableView.reloadData() // UI랑 관련있는 UI 업데이트라 메인 스레드에서 수행
-        }
-      }
-    }
-  }
 }
 
 // MARK: - DataSource
 extension CurrencyListViewController: UITableViewDataSource {
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    dataSource.count
+    items.count
   }
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     guard let cell = tableView.dequeueReusableCell(withIdentifier: CurrencyListCell.identifier) as? CurrencyListCell else { return UITableViewCell() }
-    cell.configureCell(currency: dataSource[indexPath.row])
+    cell.configureCell(currency: items[indexPath.row])
     return cell
   }
 }
@@ -123,8 +123,10 @@ extension CurrencyListViewController: UITableViewDataSource {
 // MARK: - Delegate
 extension CurrencyListViewController: UITableViewDelegate {
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    let vc = CurrencyCalculatorViewController()
-    vc.currencyItem = dataSource[indexPath.row] // vc에 눌린 셀의 정보를 넘겨줌
+    
+    let selectedItem = items[indexPath.row]
+    let vm = CurrencyCalculatorViewModel(currencyItem: selectedItem)
+    let vc = CurrencyCalculatorViewController(viewModel: vm)
     navigationItem.backButtonTitle = "환율 정보"
     navigationController?.pushViewController(vc, animated: true)
   }
@@ -135,22 +137,6 @@ extension CurrencyListViewController: UISearchBarDelegate {
   // 검색바 텍스트가 바뀔 때마다 자동 호출되는 콜백 함수
   func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
     let searchKeyword = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() // 공백,\n등 제거, 소문자.
-    
-    if searchKeyword.isEmpty { // 공백이라면 초기 상태로
-      dataSource = allCurrencyItems
-    } else {
-      dataSource = allCurrencyItems.filter {
-        // code나 countryName 중 하나라도 textLine이 포함되어 있는게 있다면 그 항목만 필터링해서 dataSource에 넣음
-        // contains. 포함이므로, 맨 앞이 아니라 어느 위치든 포함되면 true
-        $0.code.lowercased().contains(searchKeyword) ||
-        $0.countryName.lowercased().contains(searchKeyword)
-      }
-    }
-    
-    // dataSource가 비어있으면 tableView를 숨기고, resultLabel을 보여줌.
-    let isEmpty = dataSource.isEmpty
-    tableView.isHidden = isEmpty
-    resultLabel.isHidden = !isEmpty
-    tableView.reloadData()
+    viewModel.action(.search(searchKeyword))
   }
 }
