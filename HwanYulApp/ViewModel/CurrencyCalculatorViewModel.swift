@@ -10,7 +10,6 @@ enum CalculatorAction {
 }
 
 enum CalculatorState {
-  case ready(code: String, country: String) // 준비된 상태. 기본데이터
   case result(String) // 계산 결과 텍스트
   case error(AlertType) // 에러 알림 타입
 }
@@ -19,7 +18,7 @@ final class CurrencyCalculatorViewModel: ViewModelProtocol {
   typealias Action = CalculatorAction
   typealias State = CalculatorState
 
-  var state: State = .ready(code: "", country: "") {
+  var state: State = .result("계산 결과가 여기에 표시됩니다") {
     didSet {
       stateDidChange?(state)
     }

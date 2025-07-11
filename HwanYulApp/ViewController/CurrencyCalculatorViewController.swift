@@ -35,9 +35,6 @@ class CurrencyCalculatorViewController: UIViewController {
       
       DispatchQueue.main.async {
         switch state {
-        case .ready(code: let code, country: let country):
-          self.currencyCodeLabel.text = code
-          self.countryNameLabel.text = country
         case .result(let resultText):
           self.resultLabel.text = resultText
           self.amountTextField.text = ""
