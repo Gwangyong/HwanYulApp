@@ -123,9 +123,10 @@ extension CurrencyListViewController: UITableViewDataSource {
 // MARK: - Delegate
 extension CurrencyListViewController: UITableViewDelegate {
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    // FIXME: 이 부분 수정 예정 (View가 ViewModel의 데이터를 수정 중)
-    let vc = CurrencyCalculatorViewController()
-    vc.viewModel.currencyItem = items[indexPath.row] // vc에 눌린 셀의 정보를 넘겨줌
+    
+    let selectedItem = items[indexPath.row]
+    let vm = CurrencyCalculatorViewModel(currencyItem: selectedItem)
+    let vc = CurrencyCalculatorViewController(viewModel: vm)
     navigationItem.backButtonTitle = "환율 정보"
     navigationController?.pushViewController(vc, animated: true)
   }

@@ -18,7 +18,16 @@ class CurrencyCalculatorViewController: UIViewController {
   private let resultLabel = UILabel()
   
   // MARK: - ViewModel
-  let viewModel = CurrencyCalculatorViewModel()
+  let viewModel: CurrencyCalculatorViewModel
+  
+  init(viewModel: CurrencyCalculatorViewModel) {
+    self.viewModel = viewModel
+    super.init(nibName: nil, bundle: nil)
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
   
   override func viewDidLoad() {
     super.viewDidLoad()
