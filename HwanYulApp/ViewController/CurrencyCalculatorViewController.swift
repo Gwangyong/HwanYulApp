@@ -30,11 +30,14 @@ class CurrencyCalculatorViewController: UIViewController {
   
   // MARK: - ViewModel Binding
   private func bindViewModel() {
-    viewModel.stateDidChange = { [weak self] state in
+    viewModel.stateDidChange = { [weak self] state in // ViewModel 내부의 state가 변경될 때마다 클로저 호출
       guard let self else { return }
       
       DispatchQueue.main.async {
         switch state {
+        case .ready(code: let code, country: let country):
+          self.currencyCodeLabel.text = code
+          self.countryNameLabel.text = country
         case .result(let resultText):
           self.resultLabel.text = resultText
           self.amountTextField.text = ""
@@ -42,8 +45,6 @@ class CurrencyCalculatorViewController: UIViewController {
           let alert = AlertFactory.makeAlert(alertType)
           self.present(alert, animated: true)
           self.amountTextField.text = ""
-        @unknown default: // 누락된 case 대비하여 안전히 처리해줌
-          break
         }
       }
     }
@@ -83,12 +84,12 @@ class CurrencyCalculatorViewController: UIViewController {
   }
   
   private func configureCurrencyCodeLabel() {
-    currencyCodeLabel.text = viewModel.currencyItem?.code
+//    currencyCodeLabel.text = viewModel.currencyItem?.code
     currencyCodeLabel.font = .systemFont(ofSize: 24, weight: .bold)
   }
   
   private func configureCountryNameLabel() {
-    countryNameLabel.text = viewModel.currencyItem?.countryName
+//    countryNameLabel.text = viewModel.currencyItem?.countryName
     countryNameLabel.font = .systemFont(ofSize: 16)
     countryNameLabel.textColor = .gray
   }

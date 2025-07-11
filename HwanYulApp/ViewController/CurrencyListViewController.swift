@@ -9,9 +9,6 @@ import UIKit
 
 class CurrencyListViewController: UIViewController {
   
-  private var dataSource: [CurrencyItem] = [] // 화면 표시 데이터
-  private var allCurrencyItems: [CurrencyItem] = [] // 원본 데이터 저장
-  
   private let titleLabel: UILabel = {
     let label = UILabel()
     label.text = "환율 정보"
@@ -33,7 +30,7 @@ class CurrencyListViewController: UIViewController {
     tableView.rowHeight = CurrencyListCell.height // 60
     tableView.dataSource = self
     tableView.delegate = self
-    tableView.register(CurrencyListCell.self, forCellReuseIdentifier: CurrencyListCell.identifier)
+    tableView.register(CurrencyListCell.self, forCellReuseIdentifier: CurrencyListCell.identifier) // Cell UI 생성이라 View에서
     return tableView
   }()
   
@@ -50,7 +47,6 @@ class CurrencyListViewController: UIViewController {
     super.viewDidLoad()
     configureViews()
     configureLayout()
-    fetchAndBindCurrencyData()
   }
   
   // MARK: - configureViews
@@ -83,28 +79,6 @@ class CurrencyListViewController: UIViewController {
       $0.center.equalToSuperview()
     }
   }
-  
-  // MARK: - fetchAndBindCurrencyData
-  // 환율 데이터를 가져와서 바인딩하는 메서드
-  private func fetchAndBindCurrencyData() {
-    DataService().fetchCurrencyData { [weak self] currency in
-      guard let self else { return }
-      
-      DispatchQueue.main.async { // UI 관련 작업들 메인 스레드에서 실행
-        // 데이터가 비어있을 경우 Alert 표시
-        if currency.items.isEmpty {
-          let alert = AlertFactory.makeAlert(.noData)
-          self.present(alert, animated: true)
-        } else {
-          // 소문자로 변경해서 반복 비교
-          let sortedItems = currency.items.sorted { $0.code.lowercased() < $1.code.lowercased() }
-          self.dataSource = sortedItems
-          self.allCurrencyItems = sortedItems
-          self.tableView.reloadData() // UI랑 관련있는 UI 업데이트라 메인 스레드에서 수행
-        }
-      }
-    }
-  }
 }
 
 // MARK: - DataSource
@@ -124,7 +98,7 @@ extension CurrencyListViewController: UITableViewDataSource {
 extension CurrencyListViewController: UITableViewDelegate {
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     let vc = CurrencyCalculatorViewController()
-    vc.currencyItem = dataSource[indexPath.row] // vc에 눌린 셀의 정보를 넘겨줌
+    vc.viewModel.currencyItem = dataSource[indexPath.row] // vc에 눌린 셀의 정보를 넘겨줌
     navigationItem.backButtonTitle = "환율 정보"
     navigationController?.pushViewController(vc, animated: true)
   }

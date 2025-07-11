@@ -10,7 +10,8 @@ enum CalculatorAction {
 }
 
 enum CalculatorState {
-  case idle // 초기상태
+//  case idle // 초기상태
+  case ready(code: String, country: String) // 준비된 상태. 기본데이터
   case result(String) // 계산 결과 텍스트
   case error(AlertType) // 에러 알림 타입
 }
@@ -21,7 +22,7 @@ final class CurrencyCalculatorViewModel: ViewModelProtocol {
 
   var currencyItem: CurrencyItem?
 
-  var state: CalculatorState = .idle {
+  var state: CalculatorState {
     didSet {
       stateDidChange?(state)
     }
@@ -30,7 +31,12 @@ final class CurrencyCalculatorViewModel: ViewModelProtocol {
   var action: ((CalculatorAction) -> Void)? // VC가 ViewModel에게 행동 요청할때 사용
   var stateDidChange: ((CalculatorState) -> Void)? // ViewModel에서 VC에게 상태를 알려줄때 사용
 
-  init() { // ViewModel이 생성되자마자 있어야 VC에서 이벤트 던지기 가능하기에 init
+  init() { // ViewModel이 생성되자마자 있어야 VC에서 이벤트 던지기(action)가 가능하기에 init (초기값 지정 안해줘서 init)
+    state = .ready( // 바로 .ready로 View에 UI그릴 수 있도록 데이터 전달
+      code: currencyItem?.code ?? "",
+      country: currencyItem?.countryName ?? ""
+    )
+    
     action = { [weak self] action in
       self?.handle(action)
     }
