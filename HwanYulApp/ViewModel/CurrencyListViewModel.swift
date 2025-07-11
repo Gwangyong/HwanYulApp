@@ -5,7 +5,7 @@
 //  Created by 서광용 on 7/11/25.
 //
 
-import Foundation // UIKit은 UI관련이라 안되지만, Foundation은 로직을 위한 프레임워크이기에 가능
+//import Foundation // UIKit은 UI관련이라 안되지만, Foundation은 로직을 위한 프레임워크이기에 가능
 
 enum CurrencyListAction { // View(VC)가 ViewModel에게 동작을 해달라 요청.
   case loadData
@@ -21,16 +21,16 @@ final class CurrencyListViewModel: ViewModelProtocol {
   typealias Action = CurrencyListAction
   typealias State = CurrencyListState
   
-  var state: State = .failure { // View모델이 가지고 있는 상태
-    didSet {
+  var state: State = .failure { // View모델이 가지고 있는 상태 (초기값 .failure)
+    didSet { // state 값이 변겨오디면 didSet이 실행됨
       stateDidChange?(state)
     }
   }
   
   var stateDidChange: ((State) -> Void)?
+  private var allCurrencyItems: [CurrencyItem] = [] // 원본 데이터 저장
   
-  private(set) var allCurrencyItems: [CurrencyItem] = [] // 원본 데이터 저장
-  
+  // MARK: - action
   func action(_ action: Action) {
     switch action {
     case .loadData:

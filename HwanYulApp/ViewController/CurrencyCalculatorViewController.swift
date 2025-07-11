@@ -154,6 +154,6 @@ class CurrencyCalculatorViewController: UIViewController {
   
   @objc private func convertButtonTapped() {
     let inputText = amountTextField.text ?? ""
-    viewModel.action?(.convertButtonTapped(inputText: inputText))
+    viewModel.action(.convertButtonTapped(inputText: inputText))
   }
 }

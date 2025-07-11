@@ -10,7 +10,6 @@ enum CalculatorAction {
 }
 
 enum CalculatorState {
-//  case idle // 초기상태
   case ready(code: String, country: String) // 준비된 상태. 기본데이터
   case result(String) // 계산 결과 텍스트
   case error(AlertType) // 에러 알림 타입
@@ -26,44 +25,33 @@ final class CurrencyCalculatorViewModel: ViewModelProtocol {
     }
   }
 
-  var action: ((CalculatorAction) -> Void)? // VC가 ViewModel에게 행동 요청할때 사용
-  var stateDidChange: ((CalculatorState) -> Void)? // ViewModel에서 VC에게 상태를 알려줄때 사용
-  
+  // MARK: - 상태 전달
+  var stateDidChange: ((State) -> Void)? // ViewModel에서 VC에게 상태를 알려줄때 사용
+  // FIXME: VC의 FIXME 수정하고 private으로 설정
   var currencyItem: CurrencyItem?
 
-  init() {
-    action = { [weak self] action in
-      self?.action(action)
-    }
-  }
-
-  func action(_ action: CalculatorAction) {
+  // MARK: - action
+  func action(_ action: Action) {
     switch action {
     case .convertButtonTapped(let inputText):
-      self.convert(inputText: inputText)
+      convert(inputText: inputText)
     }
   }
 
+  // MARK: - 환율 계산 로직
   private func convert(inputText: String) {
-    guard !inputText.isEmpty else {
-      state = .error(.emptyInput)
+    guard let amount = Double(inputText), !inputText.isEmpty else { // 비어있지 않고, Double일 경우
+      state = inputText.isEmpty ? .error(.emptyInput) : .error(.nonNumericInput)
       return
     }
 
-    guard let amount = Double(inputText) else {
-      state = .error(.nonNumericInput)
-      return
-    }
-
-    guard let currencyItem = currencyItem else {
+    guard let currencyItem else {
       state = .error(.emptyInput)
       return
     }
 
     // 값이 왔으니, 그걸 가지고 계산해서 띄워주는.
-    let rate = currencyItem.rate
-
-    let result = amount * rate // 입력값 * 환율
+    let result = amount * currencyItem.rate // 입력값 * 환율
     let formattedAmount = String(format: "%.2f", amount) // 소수점 2자리로 반올림
     let formattedResult = String(format: "%.2f", result)
     let resultText = "$\(formattedAmount) → \(formattedResult) \(currencyItem.code)"
