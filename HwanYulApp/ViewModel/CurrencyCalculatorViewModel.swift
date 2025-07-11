@@ -28,6 +28,15 @@ final class CurrencyCalculatorViewModel: ViewModelProtocol {
   var stateDidChange: ((State) -> Void)? // ViewModel에서 VC에게 상태를 알려줄때 사용
   private let currencyItem: CurrencyItem
   
+  // currencyItem을 private하기 위해 필요한 일부만 공개
+  var codeText: String {
+    currencyItem.code
+  }
+  
+  var countryNameText: String {
+    currencyItem.countryName
+  }
+  
   init(currencyItem: CurrencyItem) {
     self.currencyItem = currencyItem
   }

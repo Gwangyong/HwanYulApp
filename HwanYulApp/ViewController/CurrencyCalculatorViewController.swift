@@ -90,10 +90,12 @@ class CurrencyCalculatorViewController: UIViewController {
   }
   
   private func configureCurrencyCodeLabel() {
+    currencyCodeLabel.text = viewModel.codeText
     currencyCodeLabel.font = .systemFont(ofSize: 24, weight: .bold)
   }
   
   private func configureCountryNameLabel() {
+    countryNameLabel.text = viewModel.countryNameText
     countryNameLabel.font = .systemFont(ofSize: 16)
     countryNameLabel.textColor = .gray
   }
