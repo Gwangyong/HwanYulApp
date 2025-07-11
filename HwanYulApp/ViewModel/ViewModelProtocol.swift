@@ -10,5 +10,5 @@ protocol ViewModelProtocol {
   associatedtype State // 화면 상태
   
   var state: State { get } // 읽기 (가져오지만 변경 불가)
-  var action: ((Action) -> Void)? { get set } // 읽기 쓰기 (가져오고 변경 가능)
+  func action(_ action: Action) 
 }

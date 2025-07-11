@@ -20,9 +20,7 @@ final class CurrencyCalculatorViewModel: ViewModelProtocol {
   typealias Action = CalculatorAction
   typealias State = CalculatorState
 
-  var currencyItem: CurrencyItem?
-
-  var state: CalculatorState {
+  var state: State = .ready(code: "", country: "") {
     didSet {
       stateDidChange?(state)
     }
@@ -30,19 +28,16 @@ final class CurrencyCalculatorViewModel: ViewModelProtocol {
 
   var action: ((CalculatorAction) -> Void)? // VC가 ViewModel에게 행동 요청할때 사용
   var stateDidChange: ((CalculatorState) -> Void)? // ViewModel에서 VC에게 상태를 알려줄때 사용
+  
+  var currencyItem: CurrencyItem?
 
-  init() { // ViewModel이 생성되자마자 있어야 VC에서 이벤트 던지기(action)가 가능하기에 init (초기값 지정 안해줘서 init)
-    state = .ready( // 바로 .ready로 View에 UI그릴 수 있도록 데이터 전달
-      code: currencyItem?.code ?? "",
-      country: currencyItem?.countryName ?? ""
-    )
-    
+  init() {
     action = { [weak self] action in
-      self?.handle(action)
+      self?.action(action)
     }
   }
 
-  private func handle(_ action: CalculatorAction) {
+  func action(_ action: CalculatorAction) {
     switch action {
     case .convertButtonTapped(let inputText):
       self.convert(inputText: inputText)
@@ -60,13 +55,18 @@ final class CurrencyCalculatorViewModel: ViewModelProtocol {
       return
     }
 
+    guard let currencyItem = currencyItem else {
+      state = .error(.emptyInput)
+      return
+    }
+
     // 값이 왔으니, 그걸 가지고 계산해서 띄워주는.
-    guard let rate = currencyItem?.rate else { return }
+    let rate = currencyItem.rate
 
     let result = amount * rate // 입력값 * 환율
     let formattedAmount = String(format: "%.2f", amount) // 소수점 2자리로 반올림
     let formattedResult = String(format: "%.2f", result)
-    let resultText = "$\(formattedAmount) → \(formattedResult) \(currencyItem?.code ?? "")"
+    let resultText = "$\(formattedAmount) → \(formattedResult) \(currencyItem.code)"
 
     state = .result(resultText)
   }
