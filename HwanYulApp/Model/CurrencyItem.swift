@@ -14,6 +14,8 @@ struct CurrencyItem {
   var countryName: String {
     CurrencyCountryMap.mapping[code] ?? "데이터에 없는 나라입니다."
   }
+  
+  var isFavorite: Bool = false
 }
 
 // MARK: Currency -> [CurrencyItem]으로 변환

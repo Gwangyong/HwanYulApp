@@ -10,6 +10,7 @@
 enum CurrencyListAction { // View(VC)가 ViewModel에게 동작을 해달라 요청.
   case loadData
   case search(String)
+  case toggleFavorite(CurrencyItem)
 }
 
 enum CurrencyListState {
@@ -37,6 +38,8 @@ final class CurrencyListViewModel: ViewModelProtocol {
       fetchCurrencyData()
     case .search(let keyword):
       filterCurrency(keyword: keyword)
+    case .toggleFavorite(let item): // item에는 몇번째 셀이 눌린건지에 대한 정보
+      toggleFavorite(item)
     }
   }
   
@@ -62,5 +65,21 @@ final class CurrencyListViewModel: ViewModelProtocol {
       }
       self.state = .success(filtered)
     }
+  }
+  
+  private func toggleFavorite(_ item: CurrencyItem) {
+    guard let index = allCurrencyItems.firstIndex(where: { $0.code == item.code}) else { return }
+    
+    allCurrencyItems[index].isFavorite.toggle()
+    
+    let sorted = allCurrencyItems.sorted {
+      if $0.isFavorite == $1.isFavorite { // 즐겨찾기된 데이터들 알파벳 오름차순 정렬
+        return $0.code < $1.code
+      } else { // 아니라면 즐겨찾기 데이터 먼저 배치
+        return $0.isFavorite && !$1.isFavorite
+      }
+    }
+    
+    self.state = .success(sorted)
   }
 }

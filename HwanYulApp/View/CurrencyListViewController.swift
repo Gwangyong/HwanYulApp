@@ -44,7 +44,7 @@ class CurrencyListViewController: UIViewController {
   }()
   
   private let viewModel = CurrencyListViewModel()
-  private var items: [CurrencyItem] = [] // 이렇게 변수를 직접 VC가 가지고 있어도 괜찮은건가..
+  private var items: [CurrencyItem] = []
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -116,6 +116,12 @@ extension CurrencyListViewController: UITableViewDataSource {
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     guard let cell = tableView.dequeueReusableCell(withIdentifier: CurrencyListCell.identifier) as? CurrencyListCell else { return UITableViewCell() }
     cell.configureCell(currency: items[indexPath.row])
+    cell.onStarTapped = { [weak self] in
+      guard let self else { return }
+      
+      let item = items[indexPath.row]
+      self.viewModel.action(.toggleFavorite(item))
+    }
     return cell
   }
 }
