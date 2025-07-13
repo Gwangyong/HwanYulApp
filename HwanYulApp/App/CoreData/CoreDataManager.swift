@@ -56,6 +56,19 @@ final class CoreDataManager {
     }
   }
   
+  // MARK: - 즐겨찾기 목록 전체 가져오기
+  func fetchAllFavoriteCodes() -> [String] {
+    let requset: NSFetchRequest<FavoriteCurrency> = FavoriteCurrency.fetchRequest()
+    
+    do {
+      let results = try context.fetch(requset)
+      return results.compactMap { $0.code }
+    } catch {
+      print("불러오기 실패: \(error)")
+      return []
+    }
+  }
+  
   // MARK: - Context 저장
   private func saveContext() {
     if context.hasChanges { // hasChanges: 저장되지 않은 변경사항이 있는지 확인하는 Bool값
