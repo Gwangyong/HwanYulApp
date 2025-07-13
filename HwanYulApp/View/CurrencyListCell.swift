@@ -13,6 +13,8 @@ final class CurrencyListCell: UITableViewCell {
   static let identifier = "CurrencyListCell"
   static let height: CGFloat = 60
   
+  var onStarTapped: (() -> Void)?
+  
   private let labelStackView: UIStackView = {
     let stackView = UIStackView()
     stackView.axis = .vertical
@@ -39,10 +41,17 @@ final class CurrencyListCell: UITableViewCell {
     return label
   }()
   
+  private let isStarButton: UIButton = {
+    let button = UIButton()
+    button.tintColor = .systemYellow
+    return button
+  }()
+  
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super .init(style: style, reuseIdentifier: reuseIdentifier)
     configureViews()
     configureLayout()
+    setupActions()
   }
   
   required init?(coder: NSCoder) {
@@ -51,7 +60,9 @@ final class CurrencyListCell: UITableViewCell {
   
   // MARK: - configureViews
   private func configureViews() {
-    [labelStackView, currencyRateLabel].forEach {
+    backgroundColor = .clear
+    contentView.backgroundColor = .systemBackground
+    [labelStackView, currencyRateLabel, isStarButton].forEach {
       contentView.addSubview($0)
     }
     
@@ -69,8 +80,13 @@ final class CurrencyListCell: UITableViewCell {
     
     currencyRateLabel.snp.makeConstraints {
       $0.centerY.equalToSuperview()
-      $0.trailing.equalToSuperview().inset(16)
+      $0.trailing.equalTo(isStarButton.snp.leading).offset(-12)
       $0.leading.greaterThanOrEqualTo(labelStackView.snp.trailing).offset(16)
+    }
+    
+    isStarButton.snp.makeConstraints {
+      $0.centerY.equalToSuperview()
+      $0.trailing.equalToSuperview().inset(16)
     }
   }
   
@@ -78,5 +94,16 @@ final class CurrencyListCell: UITableViewCell {
     currencyCodeLabel.text = "\(currency.code)"
     currencyRateLabel.text = String(format: "%.4f", currency.rate)
     countryNameLabel.text = "\(currency.countryName)"
+    
+    let imageName = currency.isFavorite ? "star.fill" : "star"
+    isStarButton.setImage(UIImage(systemName: imageName), for: .normal)
+  }
+  
+  private func setupActions() {
+    isStarButton.addTarget(self, action: #selector(starButtonTapped), for: .touchUpInside)
+  }
+  
+  @objc private func starButtonTapped() {
+    onStarTapped?()
   }
 }

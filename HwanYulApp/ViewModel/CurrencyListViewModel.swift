@@ -10,6 +10,7 @@
 enum CurrencyListAction { // View(VC)가 ViewModel에게 동작을 해달라 요청.
   case loadData
   case search(String)
+  case toggleFavorite(CurrencyItem)
 }
 
 enum CurrencyListState {
@@ -37,6 +38,8 @@ final class CurrencyListViewModel: ViewModelProtocol {
       fetchCurrencyData()
     case .search(let keyword):
       filterCurrency(keyword: keyword)
+    case .toggleFavorite(let item): // item에는 몇번째 셀이 눌린건지에 대한 정보
+      toggleFavorite(item)
     }
   }
   
@@ -45,9 +48,11 @@ final class CurrencyListViewModel: ViewModelProtocol {
     DataService().fetchCurrencyData { [weak self] result in
       guard let self else { return }
       
-      let sortedItems = result.items.sorted { $0.code.lowercased() < $1.code.lowercased() }
-      self.allCurrencyItems = sortedItems
-      self.state = .success(sortedItems)
+      let updatedItems = applyFavoriteStatus(items: result.items) // 즐겨찾기 상태 적용된 새로운 전체 배열
+      let sorted = sortCurrencyItems(updatedItems)
+      
+      self.allCurrencyItems = sorted
+      self.state = .success(sorted)
     }
   }
   
@@ -61,6 +66,46 @@ final class CurrencyListViewModel: ViewModelProtocol {
         $0.countryName.lowercased().contains(keyword)
       }
       self.state = .success(filtered)
+    }
+  }
+  
+  // MARK: - 즐겨찾기 토글 후 전달
+  private func toggleFavorite(_ item: CurrencyItem) {
+    guard let index = allCurrencyItems.firstIndex(where: { $0.code == item.code}) else { return }
+    
+    allCurrencyItems[index].isFavorite.toggle()
+    
+    // true, false 분기로 CoreData에 추가/삭제
+    if allCurrencyItems[index].isFavorite == true {
+      CoreDataManager.shared.addFavorite(code: item.code)
+    } else {
+      CoreDataManager.shared.removeFavorite(code: item.code)
+    }
+    
+    let sorted = sortCurrencyItems(allCurrencyItems)
+    self.state = .success(sorted)
+  }
+  
+  // MARK: - 알파벳 오름차순 정렬
+  private func sortCurrencyItems(_ items: [CurrencyItem]) -> [CurrencyItem] {
+    return items.sorted {
+      if $0.isFavorite == $1.isFavorite { // 즐겨찾기 여부 동일
+        return $0.code < $1.code // code기준 오름차순 정렬
+      } else {
+        return $0.isFavorite && !$1.isFavorite // 즐겨찾기는 위로
+      }
+    }
+  }
+  
+  // MARK: - 즐겨찾기 상태 반영
+  private func applyFavoriteStatus(items: [CurrencyItem]) -> [CurrencyItem] {
+    let favoriteCodes = CoreDataManager.shared.fetchAllFavoriteCodes() // 데이터 전체 불러옴
+    
+    return items.map { item in
+      var newItem = item
+      // 즐겨찾기된 code들에 포함된게 있다면, 그 item의 isFavorite은 true로 반환
+      newItem.isFavorite = favoriteCodes.contains(item.code)
+      return newItem
     }
   }
 }
