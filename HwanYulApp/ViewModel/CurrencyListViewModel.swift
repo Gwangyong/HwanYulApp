@@ -49,8 +49,9 @@ final class CurrencyListViewModel: ViewModelProtocol {
       guard let self else { return }
       
       let sortedItems = result.items.sorted { $0.code.lowercased() < $1.code.lowercased() }
-      self.allCurrencyItems = sortedItems
-      self.state = .success(sortedItems)
+      let updateItems = applyFavoriteStatus(items: sortedItems)
+      self.allCurrencyItems = updateItems
+      self.state = .success(updateItems)
     }
   }
   
@@ -67,10 +68,18 @@ final class CurrencyListViewModel: ViewModelProtocol {
     }
   }
   
+  // MARK: - 즐겨찾기 토글 후 전달
   private func toggleFavorite(_ item: CurrencyItem) {
     guard let index = allCurrencyItems.firstIndex(where: { $0.code == item.code}) else { return }
     
     allCurrencyItems[index].isFavorite.toggle()
+    
+    // true, false 분기로 CoreData에 추가/삭제
+    if allCurrencyItems[index].isFavorite == true {
+      CoreDataManager.shared.addFavorite(code: item.code)
+    } else {
+      CoreDataManager.shared.removeFavorite(code: item.code)
+    }
     
     let sorted = allCurrencyItems.sorted {
       if $0.isFavorite == $1.isFavorite { // 즐겨찾기된 데이터들 알파벳 오름차순 정렬
@@ -81,5 +90,17 @@ final class CurrencyListViewModel: ViewModelProtocol {
     }
     
     self.state = .success(sorted)
+  }
+  
+  // MARK: - 즐겨찾기 상태 반영
+  private func applyFavoriteStatus(items: [CurrencyItem]) -> [CurrencyItem] {
+    let favoriteCodes = CoreDataManager.shared.fetchAllFavoriteCodes() // 데이터 전체 불러옴
+    
+    return items.map { item in
+      var newItem = item
+      // 즐겨찾기된 code들에 포함된게 있다면, 그 item의 isFavorite은 true로 반환
+      newItem.isFavorite = favoriteCodes.contains(item.code)
+      return newItem
+    }
   }
 }
