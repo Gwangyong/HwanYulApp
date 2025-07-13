@@ -9,28 +9,9 @@ import UIKit
 import CoreData
 
 final class CoreDataManager {
-  static let shared = CoreDataManager()
-  private init() {} // 왜홰?
-  
-  /*
-   
-   1. CurrencyDataModel.xcdatamodeld
-      ↓
-   2. NSPersistentContainer 생성 (CurrencyDataModel 기반)
-      ↓
-   3. 저장소 로드 or 생성
-      ↓
-   4. context (작업 공간) 생성
-      ↓
-   5. context를 통해 데이터 추가/삭제/조회/저장
-   
-   ---
-   
-   CurrencyDatamodel이라는 파일을 기반으로, container라는 데이터베이스를 만듦
-   
-   걔를 로딩하고, 그 위에 context릘 띄운다.
-   
-   */
+  // Singleton
+  static let shared = CoreDataManager() // 앱 전역에서 사용 가능. CoreDataManager.shared
+  private init() {} // 외부에서 새로운 인스턴스 생성 못하도록
   
   lazy var persistentContainer: NSPersistentContainer = {
     // container 생성 (딱 1개만)
@@ -60,6 +41,20 @@ final class CoreDataManager {
     saveContext()
   }
   
+  // MARK: - 즐겨찾기 삭제
+  func removeFavorite(code: String) {
+    // CoreData에서 데이터 조회하기 위해 fetchRequest(요청서)가 필요
+    let request: NSFetchRequest<FavoriteCurrency> = FavoriteCurrency.fetchRequest()
+    request.predicate = NSPredicate(format: "code == %@", code) // request중에 code가 동일한 것만 찾음(predicate: 조건문)
+    
+    do {
+      let results = try context.fetch(request) // request를 context에 전달해서 데이터 조회
+      results.forEach { context.delete($0) } // 혹시 중복이 있을 수 있기에 반복해서 전체 삭제
+      saveContext()
+    } catch {
+      print("삭제 실패: \(error)")
+    }
+  }
   
   // MARK: - Context 저장
   private func saveContext() {
@@ -68,8 +63,23 @@ final class CoreDataManager {
         // 변경된 내용 저장
         try context.save()
       } catch {
-        print("저장 실패")
+        print("저장 실패: \(error)")
       }
     }
   }
 }
+
+/*
+ 
+ 공부하며 정리!
+ 
+ - CoreData 저장소: 하드디스크에 있는 엑셀 파일
+ - context: 지금 열어놓은 엑셀 창 (작업 중)
+ - fetchRequest + predicate: 고객 이름이 "%@"인 행만 보여줘. 라고 predicate(필터)한 것
+ - delete(): 엑셀 행을 지움 (현재 엑셀 창. context에서는 지워짐)
+ - saveContext(): 엑셀 저장(CMD + S) 누른 것. 실제 하드디스크(CoreData)에 반영
+ 
+ 만일, saveContext()를 안하면, delete()에서 지워진 것 처럼 보이더라도, 현재 저장안된 엑셀 파일에서만 지워진 상태
+ 즉, 프로그램을 재시작하며 load하면 CoreData에서는 안지워져서 다지 데이터가 나타남
+ 
+ */
