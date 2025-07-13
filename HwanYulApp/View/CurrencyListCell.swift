@@ -60,6 +60,8 @@ final class CurrencyListCell: UITableViewCell {
   
   // MARK: - configureViews
   private func configureViews() {
+    backgroundColor = .clear
+    contentView.backgroundColor = .systemBackground
     [labelStackView, currencyRateLabel, isStarButton].forEach {
       contentView.addSubview($0)
     }
