@@ -48,10 +48,11 @@ final class CurrencyListViewModel: ViewModelProtocol {
     DataService().fetchCurrencyData { [weak self] result in
       guard let self else { return }
       
-      let sortedItems = result.items.sorted { $0.code.lowercased() < $1.code.lowercased() }
-      let updateItems = applyFavoriteStatus(items: sortedItems)
-      self.allCurrencyItems = updateItems
-      self.state = .success(updateItems)
+      let updatedItems = applyFavoriteStatus(items: result.items) // 즐겨찾기 상태 적용된 새로운 전체 배열
+      let sorted = sortCurrencyItems(updatedItems)
+      
+      self.allCurrencyItems = sorted
+      self.state = .success(sorted)
     }
   }
   
@@ -81,15 +82,19 @@ final class CurrencyListViewModel: ViewModelProtocol {
       CoreDataManager.shared.removeFavorite(code: item.code)
     }
     
-    let sorted = allCurrencyItems.sorted {
-      if $0.isFavorite == $1.isFavorite { // 즐겨찾기된 데이터들 알파벳 오름차순 정렬
-        return $0.code < $1.code
-      } else { // 아니라면 즐겨찾기 데이터 먼저 배치
-        return $0.isFavorite && !$1.isFavorite
+    let sorted = sortCurrencyItems(allCurrencyItems)
+    self.state = .success(sorted)
+  }
+  
+  // MARK: - 알파벳 오름차순 정렬
+  private func sortCurrencyItems(_ items: [CurrencyItem]) -> [CurrencyItem] {
+    return items.sorted {
+      if $0.isFavorite == $1.isFavorite { // 즐겨찾기 여부 동일
+        return $0.code < $1.code // code기준 오름차순 정렬
+      } else {
+        return $0.isFavorite && !$1.isFavorite // 즐겨찾기는 위로
       }
     }
-    
-    self.state = .success(sorted)
   }
   
   // MARK: - 즐겨찾기 상태 반영
